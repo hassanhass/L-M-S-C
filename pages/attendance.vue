@@ -18,13 +18,13 @@ const employeeId = useStorage('employeeId',null);
 const employeeName = useStorage('employeeName',null);
 const hasCheckedIn = ref(false);
 const hasCheckedOut = ref(false);
-
-
+const token = useStorage('token', null);
 
 const checkIn = async () => {
   const { data } = await useFetch("/api/attendance/checkIn", {
     method: 'POST',
     body: { employee_id: employeeId },
+    headers: { token: token.value },
   });
 
   if (data.value) {
@@ -36,6 +36,7 @@ const checkOut = async () => {
   const { data } = await useFetch("/api/attendance/checkOut", {
     method: 'POST',
     body: { employee_id: employeeId },
+    headers: { token: token.value },
   });
 
   if (data.value) {
