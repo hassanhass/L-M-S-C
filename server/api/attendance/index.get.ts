@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
         columns: { check_in_time: true, check_out_time: true, date: true },
         with: {
             employee: {
-                columns: { name: true, email: true },
+                columns: { id:true, name: true, email: true },
             }
         }
     })

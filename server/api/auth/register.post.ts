@@ -16,5 +16,5 @@ export default defineEventHandler(async (event) => {
   });
 
   return { message: 'Employee registered successfully', employee };
-}
-);
+  
+});

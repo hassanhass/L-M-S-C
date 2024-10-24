@@ -2,7 +2,6 @@ import { attendance } from "~/server/database/schema";
 import { useMe } from "~/server/utils/me";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
   const employee = await useMe(event);
 
   const updateCheckOut = await useDrizzle().update(tables.attendance)
