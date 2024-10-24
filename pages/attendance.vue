@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-screen bg-gradient-to-r from-blue-800 to-teal-700 p-6">
-    <Header /> <!-- استخدام مكون الهيدر هنا -->
 
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center mx-auto mt-4">
       <h1 class="text-2xl font-bold mb-4">تسجيل الحضور</h1>
@@ -28,7 +27,7 @@
 <script setup>
 import { useStorage } from '@vueuse/core';
 import { ref, computed } from 'vue';
-import Header from './components/Header.vue'; // تأكد من المسار الصحيح
+import Header from './components/Header.vue'; 
 
 definePageMeta({
   middleware: 'auth'
@@ -37,7 +36,7 @@ definePageMeta({
 const employeeId = useStorage('employeeId', null);
 const employeeName = useStorage('employeeName', null);
 const token = useStorage('token', null);
-const state = ref(0); // 0: سجل الحضور, 1: تم تسجيل الحضور, 2: تم تسجيل الخروج
+const state = ref(0); 
 
 const buttonText = computed(() => {
   switch (state.value) {
@@ -74,7 +73,6 @@ const overlayClass = computed(() => {
 
 const handleAttendance = async () => {
   if (state.value === 0) {
-    // تسجيل دخول
     const { data } = await useFetch("/api/attendance/checkIn", {
       method: 'POST',
       body: { employee_id: employeeId },
@@ -82,10 +80,9 @@ const handleAttendance = async () => {
     });
 
     if (data.value) {
-      state.value = 1; // الانتقال إلى "تم تسجيل الحضور"
+      state.value = 1;
     }
   } else if (state.value === 1) {
-    // تسجيل خروج
     const { data } = await useFetch("/api/attendance/checkOut", {
       method: 'POST',
       body: { employee_id: employeeId },
@@ -93,21 +90,18 @@ const handleAttendance = async () => {
     });
 
     if (data.value) {
-      state.value = 2; // الانتقال إلى "تم تسجيل الخروج"
+      state.value = 2;
     }
   } else {
-    // إعادة تعيين الحالة بعد تسجيل الخروج
-    state.value = 0; // العودة إلى البداية
+    state.value = 0;
   }
 };
 
 const logout = async () => {
-  // هنا يمكنك إضافة أي منطق إضافي لتسجيل الخروج
   token.value = null;
   employeeId.value = null;
   employeeName.value = null;
 
-  // يمكنك إعادة توجيه المستخدم إلى صفحة تسجيل الدخول بعد تسجيل الخروج
   navigateTo('/login');
 };
 
