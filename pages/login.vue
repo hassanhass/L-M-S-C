@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <h1>Login</h1>
     <form @submit.prevent="login">
       <input v-model="email" type="email" placeholder="Email" required />
@@ -16,7 +16,7 @@ import { useStorage } from '@vueuse/core';
 const email = ref('');
 const password = ref('');
 const error = ref('');
-
+const role = useStorage('role', null);
 const token = useStorage('token', null);
 const employeeId = useStorage('employeeId', null);
 const employeeName = useStorage('employeeName', null);
@@ -33,9 +33,12 @@ async function login() {
       token.value = response.token; 
       employeeId.value = response.employee.id; 
       employeeName.value = response.employee.name; 
-
+      role.value = response.employee.role;
+      if(role.value === 'admin'){
+        navigateTo('/dashboard')
+      }else{
       navigateTo('/attendance'); 
-    } else {
+    }} else {
       error.value = 'Unexpected response structure';
     }
   } catch (err) {
