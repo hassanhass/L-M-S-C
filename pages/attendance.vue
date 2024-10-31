@@ -26,8 +26,6 @@
 
 <script setup>
 import { useStorage } from '@vueuse/core';
-import { ref, computed } from 'vue';
-import Header from './components/Header.vue'; 
 
 definePageMeta({
   middleware: 'auth'
@@ -73,7 +71,8 @@ const overlayClass = computed(() => {
 
 const handleAttendance = async () => {
   if (state.value === 0) {
-    const { data } = await useFetch("/api/attendance/checkIn", {
+    // تسجيل دخول
+    const { data } = await useFetch("/api/attendance/check-in", {
       method: 'POST',
       body: { employee_id: employeeId },
       headers: { token: token.value },
@@ -83,7 +82,8 @@ const handleAttendance = async () => {
       state.value = 1;
     }
   } else if (state.value === 1) {
-    const { data } = await useFetch("/api/attendance/checkOut", {
+    // تسجيل خروج
+    const { data } = await useFetch("/api/attendance/check-out", {
       method: 'POST',
       body: { employee_id: employeeId },
       headers: { token: token.value },
