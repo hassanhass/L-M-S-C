@@ -8,7 +8,6 @@ export const employee = sqliteTable('employees', {
     user_id: integer('user_id').references(() => user.id,
     {
         onDelete: 'set null',
-        
     }
     ),
     admin_id: integer('admin_id').references(() => admin.id),
