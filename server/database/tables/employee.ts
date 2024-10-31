@@ -5,9 +5,14 @@ import { admin } from "./admin";
 
 export const employee = sqliteTable('employees', {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    user_id: integer('user_id').references(() => user.id).notNull(),
-    admin_id: integer('admin_id').references(() => admin.id).notNull(),
-    office_id: integer('office_id').references(() => office.id).notNull(),
+    user_id: integer('user_id').references(() => user.id,
+    {
+        onDelete: 'set null',
+        
+    }
+    ),
+    admin_id: integer('admin_id').references(() => admin.id),
+    office_id: integer('office_id').references(() => office.id),
     position: text('position').notNull(),
 });
 
@@ -32,5 +37,5 @@ export const employeesRelations = relations(employee, ({ many, one }) => ({
 
 }));
 
-    // \لازم نعكس العلاقات
+
 

@@ -1,5 +1,5 @@
 import { useCurrentElement } from '@vueuse/core';
-import { eq } from 'drizzle-orm';
+import { eq, isNull, not } from 'drizzle-orm';
 import { employee, user } from '~/server/database/schema';
 
 export default defineEventHandler(async (event) => {
@@ -13,7 +13,11 @@ export default defineEventHandler(async (event) => {
 
     const employeesUnderAdmin = await useDrizzle()
         .query.employee.findMany({
-            where: eq(employee.admin_id, user.admin?.id!),
+            where:
+            and(
+                eq(employee.admin_id, user.admin?.id!),
+                not(isNull(employee.user_id))
+                ),
             with:{
                 attendanceRecords:{
                     columns: {

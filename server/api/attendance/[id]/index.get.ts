@@ -1,11 +1,14 @@
+import { not } from "drizzle-orm";
 import { useMe } from "~/server/utils/me";
 
 export default defineEventHandler(async (event) => {
-    const employee = await useMe(event,'employee');
-    if (!employee) {
-        throw createError({ statusCode: 400, message: 'Employee is not logged in' });
+    const user = await useMe(event,'employee');
+    if(!user.employee?.user_id ){
+        throw createError({
+            statusCode: 404,
+            message: 'Employee not found'
+        });
     }
-
     try {
         const findAttendance = await useDrizzle().query.attendance.findMany()
         
