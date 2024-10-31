@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col min-h-screen bg-gradient-to-r from-blue-800 to-teal-700 p-6">
-    <Header /> <!-- استخدام مكون الهيدر هنا -->
 
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center mx-auto mt-4">
       <h1 class="text-2xl font-bold mb-4">تسجيل الحضور</h1>
@@ -26,10 +25,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { useStorage } from '@vueuse/core';
-import { ref, computed } from 'vue';
-import Header from './components/Header.vue'; // تأكد من المسار الصحيح
+
 
 definePageMeta({
   middleware: 'auth'
@@ -76,7 +73,7 @@ const overlayClass = computed(() => {
 const handleAttendance = async () => {
   if (state.value === 0) {
     // تسجيل دخول
-    const { data } = await useFetch("/api/attendance/checkIn", {
+    const { data } = await useFetch("/api/attendance/check-in", {
       method: 'POST',
       body: { employee_id: employeeId },
       headers: { token: token.value },
@@ -87,7 +84,7 @@ const handleAttendance = async () => {
     }
   } else if (state.value === 1) {
     // تسجيل خروج
-    const { data } = await useFetch("/api/attendance/checkOut", {
+    const { data } = await useFetch("/api/attendance/check-out", {
       method: 'POST',
       body: { employee_id: employeeId },
       headers: { token: token.value },

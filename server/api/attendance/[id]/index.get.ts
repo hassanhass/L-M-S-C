@@ -1,17 +1,14 @@
 import { useMe } from "~/server/utils/me";
 
 export default defineEventHandler(async (event) => {
-    const employee = await useMe(event);
-
+    const employee = await useMe(event,'employee');
     if (!employee) {
         throw createError({ statusCode: 400, message: 'Employee is not logged in' });
     }
 
     try {
-        const findAttendance = await useDrizzle().query.attendance.findMany({
-            where:eq(tables.attendance.employee_id, employee.id),
-        });
-
+        const findAttendance = await useDrizzle().query.attendance.findMany()
+        
         if (!findAttendance) {
             throw createError({ statusCode: 404, message: 'Attendance not found for this employee' });
         }

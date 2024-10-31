@@ -3,28 +3,28 @@ import jwt from 'jsonwebtoken';
 
 export default defineEventHandler(async (event) => {
   const { email, password } = await readBody(event);
-  const employee = await useDrizzle()
-    .select()
-    .from(tables.employees)
-    .where(eq(tables.employees.email, email))
-    .limit(1);
 
-  if (!employee || employee.length === 0) {
+  const user = await useDrizzle().query.user.findFirst({
+    where:eq(tables.user.email, email)
+  })
+
+  if(!user){
+    throw createError({statusCode:401, message: 'unAuth'})
+  }
+  const passwordMatch = await bcrypt.compare(password, user.password);
+
+  if (!passwordMatch) {
     throw createError({ statusCode: 400, message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' });
   }
 
-  const passwordMatch = await bcrypt.compare(password, employee[0].password);
-
-  if (!passwordMatch) {
-    throw createError({ statusCode: 400, message: 'Invalid email or password' });
-  }
-
-  const token = jwt.sign({ id: employee[0].id, email: employee[0].email }, 'sdfsdfsdfsdf324k23l4klk;lk;l;sdfsd;4534535;lkl;sdlfsdl;fs;dlf', { expiresIn: '360d' });
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET || 'sese',
+    { expiresIn: '360d' }
+  );
 
   return {
-      success: true,
-      token,
-      message: 'Login successful',
-      employee: employee[0],
+    token,
+    message: 'Login successful',
   };
 });
