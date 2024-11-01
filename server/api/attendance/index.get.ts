@@ -1,23 +1,20 @@
-export default defineEventHandler(async (event) => {
+import { getTableColumns } from "drizzle-orm";
+import { attendance, employee } from "~/server/database/schema";
 
-    const attendanceRecords = await useDrizzle().query.attendance.findMany({
-        columns: { check_in_time: true, check_out_time: true },
-        with: {
-            employee: {
-                columns: {
-                    id: true,
-                    position: true,
-                },
-                with:{
-                    user: {
-                        columns: {
-                            email: true,
-                            name: true,
-                        }
-                    }
-                }
-            },
-        }
-    })
-    return attendanceRecords;
+export default defineEventHandler(async (event) => {
+    const user = await useMe(event, 'admin')
+    const {password,...userTable} = getTableColumns(tables.user)
+    const result = await useDrizzle().select({
+        user:userTable,
+        employee: tables.employee,
+        attendance: tables.attendance
+    }).from(tables.attendance).
+        innerJoin(tables.employee, and(
+            eq(tables.attendance.employee_id, tables.employee.id),
+            eq(tables.employee.admin_id, user.admin?.id!),
+        )).leftJoin(tables.user, eq(tables.employee.user_id, tables.user.id))
+    
+    return result;
 });
+
+

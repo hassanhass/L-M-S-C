@@ -1,4 +1,3 @@
-// server/api/employees/[id].delete.ts
 import { defineEventHandler, createError, getRouterParams } from 'h3';
 import { eq } from 'drizzle-orm';
 import { employee, user } from '~/server/database/schema';
