@@ -30,9 +30,12 @@
 
 <script setup>
 definePageMeta({
+
   middleware: 'admin',
+  
 });
 
 const { data: attendances, pending, error } = await useFetch('/api/attendance');
+
 </script>
 
