@@ -16,7 +16,9 @@ export default defineEventHandler(async (event) => {
             eq(tables.employee.admin_id, user.admin?.id!),
         )).leftJoin(tables.user, eq(tables.employee.user_id, tables.user.id))
     
-    return result;
+        console.log(result);
+     return result;
+
 });
 
 

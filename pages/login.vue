@@ -30,9 +30,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { useStorage } from '@vueuse/core';
-
 const email = ref('');
 const password = ref('');
 const error = ref('');
@@ -47,17 +45,19 @@ async function login() {
       method: 'POST',
       body: { email: email.value, password: password.value },
     });
-
+console.log(response);
     if (response && response.message) {
-      alert(response.message);
+    
       token.value = response.token; 
-      employeeId.value = response.employee.id; 
-      employeeName.value = response.employee.name; 
-      role.value = response.employee.role;
+      employeeId.value = response.user.id; 
+      employeeName.value = response.user.name; 
+      role.value = response.user.role;
+
       if (role.value === 'admin') {
-        navigateTo('/dashboard');
+        return navigateTo('/dashboard');
       } else {
-        navigateTo('/attendance'); 
+      
+         return navigateTo('/attendance'); 
       }
     } else {
       error.value = 'Unexpected response structure';

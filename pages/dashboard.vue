@@ -9,20 +9,17 @@
             <th class="py-3 px-4 text-left text-gray-700">البريد الإلكتروني</th>
             <th class="py-3 px-4 text-left text-gray-700">وقت الدخول</th>
             <th class="py-3 px-4 text-left text-gray-700">وقت الخروج</th>
-            <th class="py-3 px-4 text-left text-gray-700">التاريخ</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(attendance, index) in attendances" :key="index" class="hover:bg-gray-50">
-            <td class="py-3 px-4">{{ attendance.employee.name }}</td>
-            <td class="py-3 px-4">{{ attendance.employee.email }}</td>
-            <td class="py-3 px-4">{{ attendance.check_in_time }}</td>
-            <td class="py-3 px-4">{{ attendance.check_out_time || 'لم يغادر بعد' }}</td>
-            <td class="py-3 px-4">{{ attendance.date }}</td>
+          <tr v-for="(item, index) in data" :key="index" class="hover:bg-gray-50">
+            <td class="py-3 px-4">{{ item.user.name}}</td>
+            <td class="py-3 px-4">{{ item.user.email }}</td>
+            <td class="py-3 px-4">{{ item.attendance.check_in_time }}</td>
+            <td class="py-3 px-4">{{ item.attendance.check_out_time || 'لم يغادر بعد' }}</td>
           </tr>
         </tbody>
       </table>
-      <p v-if="pending" class="text-center text-gray-500 mt-4">جاري التحميل...</p>
       <p v-if="error" class="text-red-500 text-center mt-4">خطأ في تحميل البيانات: {{ error.message }}</p>
     </div>
   </div>
@@ -30,12 +27,18 @@
 
 <script setup>
 definePageMeta({
-
   middleware: 'admin',
-  
 });
 
-const { data: attendances, pending, error } = await useFetch('/api/attendance');
+import { useStorage } from '@vueuse/core';
+const token = useStorage('token', null);
+const { data,error } = await useFetch('/api/attendance',{
+
+  headers: { 
+    token: token.value,
+  }
+
+});
 
 </script>
 

@@ -3,7 +3,7 @@
 
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center mx-auto mt-4">
       <h1 class="text-2xl font-bold mb-4">تسجيل الحضور</h1>
-      <p class="mb-6">مرحبًا، {{ employeeName }}</p>
+      <p class="mb-6"> ,مرحبًا {{ employeeName }}</p>
       
       <button
         @click="handleAttendance"
@@ -101,7 +101,6 @@ const logout = async () => {
   token.value = null;
   employeeId.value = null;
   employeeName.value = null;
-
   navigateTo('/login');
 };
 
