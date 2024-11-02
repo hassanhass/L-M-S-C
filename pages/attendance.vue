@@ -25,83 +25,17 @@
 </template>
 
 <script setup>
-import { useStorage } from '@vueuse/core';
 
 definePageMeta({
   middleware: 'auth'
 });
 
-const employeeId = useStorage('employeeId', null);
-const employeeName = useStorage('employeeName', null);
-const token = useStorage('token', null);
-const state = ref(0); 
-
-const buttonText = computed(() => {
-  switch (state.value) {
-    case 0:
-      return 'انطلق للنجاح'; // حالة تسجيل الدخول
-    case 1:
-      return 'أنت هنا'; // حالة تسجيل الحضور
-    case 2:
-      return 'أراك لاحقًا'; // حالة تسجيل الخروج
-  }
-});
-
-const buttonClass = computed(() => {
-  switch (state.value) {
-    case 0:
-      return 'bg-blue-500 text-white'; // لون زر تسجيل الدخول
-    case 1:
-      return 'bg-green-500 text-white'; // لون زر تسجيل الحضور
-    case 2:
-      return 'bg-red-500 text-white'; // لون زر تسجيل الخروج
-  }
-});
-
-const overlayClass = computed(() => {
-  switch (state.value) {
-    case 0:
-      return 'bg-blue-400'; // تدرج أزرق
-    case 1:
-      return 'bg-green-400'; // تدرج أخضر
-    case 2:
-      return 'bg-red-400'; // تدرج أحمر
-  }
-});
-
-const handleAttendance = async () => {
-  if (state.value === 0) {
-    // تسجيل دخول
-    const { data } = await useFetch("/api/attendance/check-in", {
-      method: 'POST',
-      body: { employee_id: employeeId },
-      headers: { token: token.value },
-    });
-
-    if (data.value) {
-      state.value = 1;
-    }
-  } else if (state.value === 1) {
-    // تسجيل خروج
-    const { data } = await useFetch("/api/attendance/check-out", {
-      method: 'POST',
-      body: { employee_id: employeeId },
-      headers: { token: token.value },
-    });
-
-    if (data.value) {
-      state.value = 2;
-    }
-  } else {
-    state.value = 0;
-  }
-};
-
-const logout = async () => {
-  token.value = null;
-  employeeId.value = null;
-  employeeName.value = null;
-  navigateTo('/login');
-};
-
+const {
+  employeeName,
+   buttonText,
+   buttonClass,
+   overlayClass,
+   handleAttendance,
+   logout}=useAttendance()
+   
 </script>

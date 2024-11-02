@@ -3,24 +3,12 @@
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
       <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">تسجيل الدخول</h1>
       <form @submit.prevent="login">
-        <input
-          v-model="email"
-          type="email"
-          placeholder="البريد الإلكتروني"
-          required
-          class="border border-gray-300 p-2 mb-4 rounded w-full"
-        />
-        <input
-          v-model="password"
-          type="password"
-          placeholder="كلمة المرور"
-          required
-          class="border border-gray-300 p-2 mb-4 rounded w-full"
-        />
-        <button
-          type="submit"
-          class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-300"
-        >
+        <input v-model="email" type="email" placeholder="البريد الإلكتروني" required
+          class="border border-gray-300 p-2 mb-4 rounded w-full" />
+        <input v-model="password" type="password" placeholder="كلمة المرور" required
+          class="border border-gray-300 p-2 mb-4 rounded w-full" />
+        <button type="submit"
+          class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-300">
           تسجيل الدخول
         </button>
       </form>
@@ -45,19 +33,19 @@ async function login() {
       method: 'POST',
       body: { email: email.value, password: password.value },
     });
-console.log(response);
+    console.log(response);
     if (response && response.message) {
-    
-      token.value = response.token; 
-      employeeId.value = response.user.id; 
-      employeeName.value = response.user.name; 
+
+      token.value = response.token;
+      employeeId.value = response.user.id;
+      employeeName.value = response.user.name;
       role.value = response.user.role;
 
       if (role.value === 'admin') {
         return navigateTo('/dashboard');
       } else {
-      
-         return navigateTo('/attendance'); 
+
+        return navigateTo('/attendance');
       }
     } else {
       error.value = 'Unexpected response structure';
@@ -68,4 +56,3 @@ console.log(response);
   }
 }
 </script>
-

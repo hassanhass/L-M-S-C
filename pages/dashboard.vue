@@ -1,44 +1,50 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-800 to-teal-700 p-6">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl">
-      <h1 class="text-3xl font-bold mb-4 text-center">تسجيل الحضور</h1>
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="py-3 px-4 text-left text-gray-700">اسم الموظف</th>
-            <th class="py-3 px-4 text-left text-gray-700">البريد الإلكتروني</th>
-            <th class="py-3 px-4 text-left text-gray-700">وقت الدخول</th>
-            <th class="py-3 px-4 text-left text-gray-700">وقت الخروج</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(item, index) in data" :key="index" class="hover:bg-gray-50">
-            <td class="py-3 px-4">{{ item.user.name}}</td>
-            <td class="py-3 px-4">{{ item.user.email }}</td>
-            <td class="py-3 px-4">{{ item.attendance.check_in_time }}</td>
-            <td class="py-3 px-4">{{ item.attendance.check_out_time || 'لم يغادر بعد' }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p v-if="error" class="text-red-500 text-center mt-4">خطأ في تحميل البيانات: {{ error.message }}</p>
-    </div>
+  <div>
+    <h1>قائمة الموظفين</h1>
+    <div v-if="loading">جارٍ التحميل...</div>
+    <div v-else-if="employees.length === 0">لا توجد بيانات</div>
+    <ul v-else>
+      <li v-for="employee in employees" :key="employee.id" class="employee-card">
+        <h2>{{ employee.user.name }}</h2>
+        <p><strong>Email:</strong> {{ employee.user.email }}</p>
+        <p><strong>Position:</strong> {{ employee.position }}</p>
+        <p><strong>Gender:</strong> {{ employee.user.gender }}</p>
+        <p><strong>Birth Date:</strong> {{ formatDate(employee.user.birth_date) }}</p>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script setup>
-definePageMeta({
-  middleware: 'admin',
-});
-
+import { ref } from 'vue';
 import { useStorage } from '@vueuse/core';
 const token = useStorage('token', null);
-const { data,error } = await useFetch('/api/attendance',{
+const employees = ref([]);
+const loading = ref(true);
 
-  headers: { 
-    token: token.value,
+async function fetchEmployees() {
+  try {
+    const response = await $fetch('/api/admin/attendance/employees', {
+      headers: {
+        token: token.value, 
+        
+      }
+    });
+    
+    console.log(response);
+    employees.value = response.employees; 
+
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+  } finally {
+    loading.value = false;
   }
+}
 
-});
+function formatDate(dateString) {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString('ar-EG', options);
+}
 
+fetchEmployees();
 </script>
-

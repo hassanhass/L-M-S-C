@@ -18,5 +18,3 @@ export const userRelations = relations(user, ({ one }) => ({
     employee: one(employee),
     admin: one(admin),
 }));
-
-
