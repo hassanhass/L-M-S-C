@@ -3,6 +3,8 @@ import { attendance, employee } from "~/server/database/schema";
 
 export default defineEventHandler(async (event) => {
     const user = await useMe(event, 'admin')
+
+    
     const {password,...userTable} = getTableColumns(tables.user)
     const result = await useDrizzle().select({
         user:userTable,

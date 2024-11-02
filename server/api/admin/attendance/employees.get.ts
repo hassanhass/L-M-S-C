@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
         return { message: "Admin not found or not an admin role" };
     }
 
+    
     const employeesUnderAdmin = await useDrizzle()
         .query.employee.findMany({
             where:
