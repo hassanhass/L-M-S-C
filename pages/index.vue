@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-[#3A5588] to-[#4D77B3]">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-     
       <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">تسجيل</h1>
       <form @submit.prevent="login">
         <div class="mb-4">
@@ -59,9 +58,9 @@ async function login() {
       role.value = response.user.role;
 
       if (role.value === 'admin') {
-        return navigateTo('/dashboard');
+        return navigateTo('/admin-vue/dashboard');
       } else {
-        return navigateTo('/attendance');
+        return navigateTo('employee/attendance');
       }
     } else {
       error.value = 'Unexpected response structure';
