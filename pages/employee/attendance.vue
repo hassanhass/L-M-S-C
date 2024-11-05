@@ -54,7 +54,8 @@
           @click="viewAttendanceRecords"
           class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-lg shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 flex items-center justify-center"
         >
-          <span class="material-icons mr-2"> View Attendance Records
+          <span class="material-icons mr-2">
+             View Attendance Records
           </span>
         </button>
       </div>
