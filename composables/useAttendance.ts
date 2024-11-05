@@ -1,51 +1,61 @@
-import { ref, computed } from 'vue'
-import { useStorage } from '@vueuse/core'
+// composables/useAttendance.ts
+import { ref, computed } from 'vue';
+import { useStorage } from '@vueuse/core';
+import { useRouter } from 'vue-router';
 
 export const useAttendance = () => {
-  const isCheckedIn = ref(false)
-  const employeeId = useStorage('employeeId', null)
-  const employeeName = useStorage('employeeName', null)
-  const token = useStorage('token', null)
+  const isCheckedIn = ref(false);
+  const employeeId = useStorage('employeeId', '');
+  const employeeName = useStorage('employeeName', '');
+  const token = useStorage('token', '');
+  const router = useRouter();
 
   const buttonText = computed(() => 
-    isCheckedIn.value ? 'تسجيل الانصراف' : 'تسجيل الحضور'
-  )
-
-  const buttonClass = computed(() => 
-    isCheckedIn.value ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
-  )
+    isCheckedIn.value ? 'Check Out' : 'Check In'
+  );
 
   const handleAttendance = async () => {
     try {
-      const { data } = await useFetch("/api/attendance/check-in", {
+      const response = await useFetch('/api/attendance/check-in', {
         method: 'POST',
-        body: { employee_id: employeeId.value },
-        headers: { 'token': token.value! },
-      })
+        headers: {
+          'Authorization': `Bearer ${token.value}`
+        }
+      });
 
-      if (data.value) {
-        isCheckedIn.value = !isCheckedIn.value
+      if (response.error) {
+        console.error('Error handling attendance:', response.error);
+        // Optionally show an error message to the user
+        return;
+      }
+
+      if (response.data) {
+        isCheckedIn.value = !isCheckedIn.value;
+        // Optionally show a success message to the user
       }
     } catch (error) {
-      console.error('Error handling attendance:', error)
+      console.error('Error handling attendance:', error);
+      // Optionally show an error message to the user
     }
-  }
+  };
 
   const logout = () => {
-    token.value = null
-    employeeId.value = null
-    employeeName.value = null
-    navigateTo('/')
-  }
+    token.value = '';
+    employeeId.value = '';
+    employeeName.value = '';
+    router.push('/');
+  };
+
+  const viewAttendanceRecords = () => {
+    router.push('/employee/dashboard');
+  };
 
   return {
     isCheckedIn,
-    employeeId,
     employeeName,
-    token,
     buttonText,
-    buttonClass,
     handleAttendance,
-    logout
-  }
-}
+    logout,
+    viewAttendanceRecords
+  };
+};
