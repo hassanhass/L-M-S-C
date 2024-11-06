@@ -18,7 +18,11 @@ export const useAttendance = () => {
   const notificationType = ref('success')
   const notificationMessage = ref('')
 
+  // ضبط نص الزر بناءً على حالة isCheckedIn
   const buttonText = computed(() => isCheckedIn.value ? 'Check Out' : 'Check In')
+  
+  // كلاس الزر يحدد اللون بناءً على حالة isCheckedIn
+  const buttonClass = computed(() => isCheckedIn.value ? 'btn-green' : 'btn-red')
 
   function updateDateTime() {
     const now = new Date()
@@ -51,16 +55,18 @@ export const useAttendance = () => {
 
   async function handleAttendance() {
     try {
-        const response = await $fetch('/api/attendance/check-in', {
+        // إرسال طلب الحضور/الخروج إلى الخادم
+        const response = await $fetch<{ message: string; toggleState: string }>('/api/attendance/check-in', {
             method: 'POST',
             headers: { 
                 'token': token.value,
                 'Content-Type': 'application/json'
             }
         });
-
-        if (response.status === 'success') {
-            isCheckedIn.value = !isCheckedIn.value;
+  
+        // التحقق من toggleState مباشرة بدون استخدام status
+        if (response.toggleState === 'checkedIn' || response.toggleState === 'checkedOut') {
+            isCheckedIn.value = response.toggleState === 'checkedIn'; // تحديث isCheckedIn بناءً على toggleState
             showToast(response.message, 'success');
             updateStatusMessage();
         } else {
@@ -70,7 +76,7 @@ export const useAttendance = () => {
         console.error('Error handling attendance:', error);
         showToast(error.message || 'Failed to process attendance', 'error');
     }
-}
+  }
 
   function updateStatusMessage() {
     statusMessage.value = isCheckedIn.value 
@@ -100,6 +106,7 @@ export const useAttendance = () => {
     notificationType,
     notificationMessage,
     buttonText,
+    buttonClass, // إرجاع كلاس الزر
     toggleMenu,
     handleAttendance,
     viewAttendanceRecords,

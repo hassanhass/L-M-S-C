@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
                 })
                 .execute();
 
-            return { message: "Check-in successful" };
+            return { message: "Check-in successful", toggleState: "checkedIn" };
         } else {
             const updatedRecord = await useDrizzle()
                 .update(attendance)
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
                 .where(eq(attendance.id, lastAttendanceRecord.id))
                 .execute();
 
-            return { message: "Check-out successful"};
+            return { message: "Check-out successful" , toggleState: "checkedOut" };
         }
     } else {
         const newAttendanceRecord = await useDrizzle()
@@ -45,6 +45,6 @@ export default defineEventHandler(async (event) => {
             })
             .execute();
 
-        return { message: "Check-in successful" };
+        return { message: "Check-in successful" ,toggleState: "checkedIn" };
     }
 });
