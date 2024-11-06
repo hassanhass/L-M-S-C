@@ -1,119 +1,208 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 flex flex-col">
+  <div class="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 flex flex-col">
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-10">
-      <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center">
-          <h1 class="text-xl sm:text-2xl font-bold text-indigo-800">TimeMatrix</h1>
-          <div class="flex items-center space-x-2 sm:space-x-4">
-            <div class="text-right">
-              <p class="text-sm font-medium text-gray-900">{{ employeeName }}</p>
-              <p class="text-xs text-gray-500">{{ currentDate }}</p>
+    <header class="bg-white/80 backdrop-blur-sm shadow-md sticky top-0 z-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <!-- App Logo -->
+          <div class="flex items-center">
+            <span class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              TimeMatrix
+            </span>
+          </div>
+          
+          <!-- User Info and Menu -->
+          <div class="flex items-center space-x-4">
+            <!-- User Info -->
+            <div class="hidden sm:flex items-center space-x-3 bg-gradient-to-r from-indigo-50 to-purple-50 px-3 py-2 rounded-full">
+              <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center shadow-inner">
+                <span class="text-white font-semibold text-sm sm:text-lg">
+                  {{ employeeName.charAt(0).toUpperCase() }}
+                </span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs sm:text-sm font-semibold text-gray-700">
+                  {{ employeeName }}
+                </span>
+                <span class="text-xs text-gray-500">Employee</span>
+              </div>
             </div>
-            <button
-              @click="logout"
-              class="p-2 rounded-full text-gray-400 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200"
-            >
-              <span class="material-icons text-base sm:text-lg">logout</span>
-            </button>
+
+            <!-- Menu Button -->
+            <div class="relative" ref="menuRef">
+              <button 
+                @click="toggleMenu"
+                class="group relative w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <div class="flex flex-col space-y-1.5 w-5">
+                  <span class="w-full h-0.5 bg-white rounded-full transform transition-all duration-300"
+                    :class="{ 'rotate-45 translate-y-2': isMenuOpen }"></span>
+                  <span class="w-full h-0.5 bg-white rounded-full transition-all duration-300"
+                    :class="{ 'opacity-0': isMenuOpen }"></span>
+                  <span class="w-full h-0.5 bg-white rounded-full transform transition-all duration-300"
+                    :class="{ '-rotate-45 -translate-y-2': isMenuOpen }"></span>
+                </div>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <transition
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <div v-if="isMenuOpen" 
+                    class="absolute right-0 mt-3 w-48 rounded-xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 overflow-hidden">
+                  <div class="py-1">
+                    <button
+                      @click="viewAttendanceRecords"
+                      class="group flex w-full items-center px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-300"
+                    >
+                      <svg class="mr-3 h-5 w-5 text-indigo-400 group-hover:text-indigo-500" 
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      Attendance Records
+                    </button>
+                    
+                    <button
+                      @click="logout"
+                      class="group flex w-full items-center px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 transition-all duration-300"
+                    >
+                      <svg class="mr-3 h-5 w-5 text-red-400 group-hover:text-red-500" 
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </transition>
+            </div>
           </div>
         </div>
       </div>
     </header>
 
-    <main class="flex-grow flex flex-col justify-center p-4 sm:p-6 max-w-md mx-auto w-full">
-      <!-- Clock Section -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-        <div class="text-center">
-          <div class="text-3xl sm:text-5xl font-bold text-indigo-800 mb-2">{{ currentTime }}</div>
-          <div class="text-base sm:text-lg text-gray-600">{{ currentDay }}</div>
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center p-4">
+      <div class="max-w-md w-full mx-auto">
+        <!-- Clock Display -->
+        <div class="bg-white overflow-hidden shadow-lg rounded-2xl mb-8">
+          <div class="p-6 sm:p-8">
+            <div class="text-center">
+              <div class="text-3xl sm:text-5xl md:text-5xl font-semibold text-indigo-600 mb-4 font-mono tracking-wider">
+                {{ currentTime }}
+              </div>
+              <div class="text-lg sm:text-xl text-gray-600 font-medium">
+                {{ currentDay }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance Button -->
+        <div class="flex justify-center mb-8">
+          <button
+  @click="handleAttendance"
+  :class="[
+    'attendance-button w-40 h-40 sm:w-48 sm:h-48 rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold text-white shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95',
+    isCheckedIn 
+      ? 'bg-red-500 hover:bg-red-600'
+      : 'bg-green-500 hover:bg-green-600'
+  ]"
+>
+  {{ buttonText }}
+</button>
+        </div>
+
+        <!-- Status Message -->
+        <div class="text-center text-lg text-gray-700">
+          {{ statusMessage }}
         </div>
       </div>
-
-      <!-- Attendance Section -->
-      <div class="flex flex-col items-center mb-8">
-        <button
-          @click="handleAttendance"
-          :class="[
-            'w-32 h-32 sm:w-48 sm:h-48 rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold text-white shadow-lg transition-all duration-300',
-            isCheckedIn 
-              ? 'bg-red-500 hover:bg-red-600 active:bg-red-700' 
-              : 'bg-green-500 hover:bg-green-600 active:bg-green-700'
-          ]"
-        >
-          {{ isCheckedIn ? 'Check Out' : 'Check In' }}
-        </button>
-        <p class="mt-4 text-base sm:text-lg font-medium text-center" :class="isCheckedIn ? 'text-red-600' : 'text-green-600'">
-          {{ isCheckedIn ? 'You are currently checked in' : 'Ready to start your workday' }}
-        </p>
-      </div>
-
-      <!-- Actions Section -->
-      <div class="space-y-4">
-        <button
-          @click="viewAttendanceRecords"
-          class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-lg shadow-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 flex items-center justify-center"
-        >
-          <span class="material-icons mr-2">
-             View Attendance Records
-          </span>
-        </button>
-      </div>
     </main>
+
+    <!-- Notification Toast -->
+    <div
+      v-if="showNotification"
+      class="fixed bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white text-lg font-medium z-50"
+      :class="[
+        notificationType === 'success' ? 'bg-green-500' : 'bg-red-500',
+      ]"
+    >
+      {{ notificationMessage }}
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useStorage } from '@vueuse/core'
+import { onMounted, onUnmounted } from 'vue'
+import { definePageMeta } from '#imports'
+import { useAttendance } from '@/composables/useAttendance'
 
-const employeeName = useStorage('employeeName', '')
-const token = useStorage('token', null)
-const isCheckedIn = ref(false)
-const currentTime = ref('')
-const currentDate = ref('')
-const currentDay = ref('')
+definePageMeta({
+  middleware: ['auth']
+})
 
-function updateDateTime() {
-  const now = new Date()
-  currentTime.value = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })
-  currentDate.value = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-  currentDay.value = now.toLocaleDateString('en-US', { weekday: 'long' })
-}
 
 onMounted(() => {
   updateDateTime()
-  setInterval(updateDateTime, 1000)
+  const timer = setInterval(updateDateTime, 1000)
+  updateStatusMessage()
+
+  onUnmounted(() => {
+    clearInterval(timer)
+  })
 })
 
-async function handleAttendance() {
-  try {
-    const response = await $fetch('/api/attendance/check-in', {
-      method: 'POST',
-      headers: { 'token': token.value }
-    })
-    isCheckedIn.value = !isCheckedIn.value
-    console.log('Attendance response:', response)
-  } catch (error) {
-    console.error('Error handling attendance:', error)
-    // You might want to show an error message to the user here
-  }
-}
+const {
+  isCheckedIn,
+  isMenuOpen,
+  employeeName,
+  currentTime,
+  currentDay,
+  statusMessage,
+  showNotification,
+  notificationType,
+  notificationMessage,
+  buttonText,
+  toggleMenu,
+  handleAttendance,
+  viewAttendanceRecords,
+  logout,
+  updateStatusMessage,
+  updateDateTime
+} = useAttendance()
 
-function viewAttendanceRecords() {
-  navigateTo('/employee/dashboard')
-}
-
-function logout() {
-  token.value = null
-  employeeName.value = ''
-  navigateTo('/')
-}
 </script>
 
 <style scoped>
+.attendance-button {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.attendance-button:hover {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* Mobile Optimization */
 @media (max-width: 640px) {
-  .material-icons {
+  .attendance-button {
     font-size: 1.25rem;
   }
 }

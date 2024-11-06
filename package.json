@@ -11,6 +11,7 @@
     "db:generate": "bun run drizzle-kit generate"
   },
   "dependencies": {
+    "@headlessui/vue": "^1.7.23",
     "@nuxthub/core": "npm:@nuxthub/core@nightly",
     "@vee-validate/zod": "^4.14.3",
     "@vueuse/core": "^11.1.0",
