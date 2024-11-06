@@ -1,61 +1,68 @@
 <template>
-  <div class="min-h-screen bg-gray-100 p-4">
-    <div class="max-w-7xl mx-auto">
-      <!-- Header -->
-      <div class="bg-white shadow rounded-lg p-6 mb-6">
+  <div class="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-sm shadow-md sticky top-0 z-10">
+      <div class="max-w-7xl mx-auto px-4 py-4">
         <div class="flex justify-between items-center">
+          <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            TimeMatrix
+          </h1>
+          
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4 space-y-6 overflow-y-auto">
+      <!-- Employee Info -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="flex items-center space-x-4">
+         
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">سجلات الحضور</h1>
-            <p class="text-gray-600">{{ employeeName }}</p>
+            <h2 class="text-xl font-semibold text-gray-800">{{ employeeName }}</h2>
+            <p class="text-gray-600">Employee</p>
           </div>
-          <NuxtLink 
-            to="/employee/attendance"
-            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Home page
-          </NuxtLink>
         </div>
       </div>
 
       <!-- Total Hours -->
-      <div class="bg-white shadow rounded-lg p-6 mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">إجمالي ساعات العمل هذا الشهر</h2>
-        <p class="text-2xl font-bold text-blue-600">{{ totalHours.toFixed(2) }} ساعة</p>
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Total Hours This Month</h2>
+        <p class="text-3xl font-bold text-indigo-600">{{ totalHours.toFixed(2) }} hours</p>
       </div>
 
-      <!-- Records Table -->
-      <div class="bg-white shadow rounded-lg overflow-hidden">
-        <div class="p-4">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  التاريخ
-                </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  وقت الحضور
-                </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  وقت الانصراف
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="record in attendanceRecords" :key="record.id">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatDate(record.check_in_time) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatTime(record.check_in_time) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ record.check_out_time ? formatTime(record.check_out_time) : '-' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- Attendance Records -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Attendance Records</h2>
+        <div class="space-y-4">
+          <div v-for="record in attendanceRecords" :key="record.id" class="border-b border-gray-200 pb-2">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-sm text-gray-500">{{ formatDate(record.check_in_time) }}</p>
+                <p class="font-medium">
+                  {{ formatTime(record.check_in_time) }} - 
+                  {{ record.check_out_time ? formatTime(record.check_out_time) : 'Ongoing' }}
+                </p>
+              </div>
+              <span class="text-indigo-600 font-medium">
+                {{ calculateDuration(record.check_in_time, record.check_out_time) }}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
+    </main>
+
+    <!-- Back to Home Button -->
+    <div class="fixed bottom-6 right-6">
+      <NuxtLink 
+        to="/employee/attendance"
+        class="bg-indigo-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-600 transition duration-300"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -80,13 +87,13 @@ onMounted(async () => {
   }
   
   try {
-    // جلب سجلات الحضور
+    // Fetch attendance records
     const response = await $fetch(`/api/attendance/${employeeId.value}`, {
       headers: { 'token': token.value }
     })
     attendanceRecords.value = response
 
-    // جلب إجمالي ساعات العمل
+    // Fetch total hours
     const totalHoursResponse = await $fetch(`/api/attendance/${employeeId.value}/total-hours`, {
       method: 'POST',
       body: { employee_id: employeeId.value },
@@ -100,14 +107,9 @@ onMounted(async () => {
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  
-  return `${day}/${month}/${year}`;
+  return date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-// دالة لتنسيق الوقت
 const formatTime = (dateString) => {
   return new Date(dateString).toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -115,4 +117,20 @@ const formatTime = (dateString) => {
     hour12: true
   })
 }
+
+const calculateDuration = (checkIn, checkOut) => {
+  if (!checkOut) return 'Ongoing'
+  const start = new Date(checkIn)
+  const end = new Date(checkOut)
+  const diff = end - start
+  const hours = Math.floor(diff / 3600000)
+  const minutes = Math.floor((diff % 3600000) / 60000)
+  return `${hours}h ${minutes}m`
+}
+
+
 </script>
+
+<style scoped>
+/* Add any additional styles here if needed */
+</style>
