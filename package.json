@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
+    "@heroicons/vue": "^2.1.5",
     "@nuxthub/core": "npm:@nuxthub/core@nightly",
     "@vee-validate/zod": "^4.14.3",
     "@vueuse/core": "^11.1.0",
@@ -21,6 +22,7 @@
     "drizzle-orm": "^0.35.2",
     "hub": "^6.1.3",
     "init": "^0.1.2",
+    "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-vue-next": "^0.453.0",
     "module": "^1.2.5",

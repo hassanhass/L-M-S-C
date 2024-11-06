@@ -108,12 +108,13 @@
         <!-- Attendance Button -->
         <div class="flex justify-center mb-8">
           <button
-  @click="handleAttendance"
+  @click="hussam"
   :class="[
     'attendance-button w-40 h-40 sm:w-48 sm:h-48 rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold text-white shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95',
-    isCheckedIn 
+    lastAttendance?.check_in_time && !lastAttendance?.check_out_time
       ? 'bg-red-500 hover:bg-red-600'
       : 'bg-green-500 hover:bg-green-600'
+      
   ]"
 >
   {{ buttonText }}
@@ -132,10 +133,13 @@
       v-if="showNotification"
       class="fixed bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white text-lg font-medium z-50"
       :class="[
-        notificationType === 'success' ? 'bg-green-500' : 'bg-green-500',
+        notificationType === 'success'
+         ? 'bg-green-500' 
+         : 'bg-red-500',
       ]"
     >
       {{ notificationMessage }}
+
     </div>
   </div>
 </template>
@@ -144,21 +148,39 @@
 import { onMounted, onUnmounted } from 'vue'
 import { definePageMeta } from '#imports'
 import { useAttendance } from '@/composables/useAttendance'
+import { useStorage } from '@vueuse/core'
 
 definePageMeta({
   middleware: ['auth']
 })
 
+const token = useStorage('token', null)
 
 onMounted(() => {
   updateDateTime()
   const timer = setInterval(updateDateTime, 1000)
   updateStatusMessage()
 
+  
   onUnmounted(() => {
     clearInterval(timer)
+
   })
 })
+
+const {data:lastAttendance,execute}= await useFetch('/api/attendance/last',{
+
+  headers: {
+    'token':token.value
+  }
+})
+const hussam =()=>{
+
+  handleAttendance()
+  execute()
+
+}
+
 
 const {
   isCheckedIn,

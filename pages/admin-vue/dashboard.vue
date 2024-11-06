@@ -1,132 +1,141 @@
 <template>
-  <div class="min-h-screen bg-background">
-    <!-- Header -->
-    <header class="bg-card shadow">
-      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center">
-          <h1 class="text-3xl font-bold text-foreground">لوحة تحكم المدير</h1>
-          <Button variant="outline" @click="logout">تسجيل الخروج</Button>
-        </div>
+  <div class="flex h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <aside class="bg-white shadow-md w-64 hidden md:block">
+      <div class="p-6">
+        <h1 class="text-xl font-semibold text-gray-800">Admin Dashboard</h1>
+        <nav class="mt-8">
+          <div v-for="link in navLinks" :key="link.title" class="mb-4">
+            <button
+              @click="link.action"
+              class="flex items-center w-full p-3 text-gray-600 hover:bg-blue-100 rounded-lg transition duration-200"
+            >
+              <component :is="link.icon" class="w-5 h-5 mr-2" />
+              {{ link.title }}
+            </button>
+          </div>
+        </nav>
       </div>
-    </header>
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-        <Card class="col-span-1">
-          <CardHeader>
-            <CardTitle>إجمالي الموظفين</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p class="text-2xl font-semibold">{{ employees.length }}</p>
-          </CardContent>
-        </Card>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800">Employees</h2>
+        <button @click="toggleMobileMenu" class="md:hidden text-gray-600">
+          <MenuIcon class="w-6 h-6" />
+        </button>
       </div>
 
-      <!-- Employee Management -->
-      <Card class="mb-6">
-        <CardHeader class="flex flex-row items-center justify-between">
-          <CardTitle>إدارة الموظفين</CardTitle>
-          <Button @click="openAddEmployeeModal">إضافة موظف جديد</Button>
-        </CardHeader>
-        <CardContent>
-          <!-- Loading State -->
-          <div v-if="loading" class="text-center py-4">
-            <p class="text-muted-foreground">جاري تحميل البيانات...</p>
+      <!-- Add/Edit Employee Form -->
+      <div v-if="showForm" class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h3 class="text-lg font-semibold mb-4">
+          {{ selectedEmployee ? 'Edit Employee' : 'Add New Employee' }}
+        </h3>
+        <form @submit.prevent="handleSubmit" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Name</label>
+            <input 
+              v-model="formData.name"
+              type="text"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
 
-          <!-- Error State -->
-          <div v-else-if="error" class="bg-destructive/10 text-destructive p-4 rounded-md">
-            {{ error }}
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <input 
+              v-model="formData.email"
+              type="email"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
 
-          <!-- Empty State -->
-          <div v-else-if="employees.length === 0" class="text-center py-4">
-            <p class="text-muted-foreground">لا يوجد موظفين حالياً</p>
+          <div v-if="!selectedEmployee">
+            <label class="block text-sm font-medium text-gray-700">Password</label>
+            <input 
+              v-model="formData.password"
+              type="password"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
 
-          <!-- Employees Table -->
-          <div v-else class="overflow-x-auto">
-            <table class="w-full">
-              <thead>
-                <tr class="border-b">
-                  <th class="px-4 py-2 text-right">الاسم</th>
-                  <th class="px-4 py-2 text-right">البريد الإلكتروني</th>
-                  <th class="px-4 py-2 text-right">المنصب</th>
-                  <th class="px-4 py-2 text-right">الجنس</th>
-                  <th class="px-4 py-2 text-right">تاريخ التعيين</th>
-                  <th class="px-4 py-2 text-right">الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="employee in employees" 
-                    :key="employee.id" 
-                    class="border-b hover:bg-muted/50">
-                  <td class="px-4 py-2">{{ employee.user.name }}</td>
-                  <td class="px-4 py-2">{{ employee.user.email }}</td>
-                  <td class="px-4 py-2">{{ employee.position }}</td>
-                  <td class="px-4 py-2">{{ employee.user.gender === 'male' ? 'ذكر' : 'أنثى' }}</td>
-                  <td class="px-4 py-2">{{ formatDate(employee.user.birth_date) }}</td>
-                  <td class="px-4 py-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      @click="openAttendanceDialog(employee)">
-                      سجلات الحضور
-                    </Button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Position</label>
+            <input 
+              v-model="formData.position"
+              type="text"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
-        </CardContent>
-      </Card>
 
-      <!-- Attendance Records Dialog -->
-      <div v-if="showDialog" 
-           class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center"
-           @click.self="closeDialog">
-        <div class="bg-background rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-          <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-              <h3 class="text-2xl font-bold">
-                سجلات حضور: {{ currentEmployee?.user.name }}
-              </h3>
-              <Button variant="ghost" size="icon" @click="closeDialog">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </Button>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead>
-                  <tr class="border-b">
-                    <th class="px-4 py-2 text-right">اليوم</th>
-                    <th class="px-4 py-2 text-right">التاريخ</th>
-                    <th class="px-4 py-2 text-right">وقت الحضور</th>
-                    <th class="px-4 py-2 text-right">وقت الانصراف</th>
-                    <th class="px-4 py-2 text-right">إجمالي الساعات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="record in currentEmployee?.attendanceRecords" 
-                      :key="record.id"
-                      class="border-b hover:bg-muted/50">
-                    <td class="px-4 py-2">{{ formatDay(record.check_in_time) }}</td>
-                    <td class="px-4 py-2">{{ formatDate(record.check_in_time) }}</td>
-                    <td class="px-4 py-2">{{ formatTime(record.check_in_time) }}</td>
-                    <td class="px-4 py-2">
-                      {{ record.check_out_time ? formatTime(record.check_out_time) : 'لم يسجل الخروج' }}
-                    </td>
-                    <td class="px-4 py-2">
-                      {{ calculateHours(record.check_in_time, record.check_out_time) }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Gender</label>
+            <select 
+              v-model="formData.gender"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
           </div>
+
+          <div class="flex justify-end gap-3 mt-6">
+            <button 
+              type="button"
+              @click="closeForm"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition duration-200"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition duration-200"
+            >
+              {{ selectedEmployee ? 'Update' : 'Add' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Employee List -->
+      <div v-if="pending" class="flex justify-center items-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+
+      <div v-else-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        {{ error.message }}
+      </div>
+
+      <div v-else>
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white border border-gray-300 rounded-md shadow-md">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="py-2 px-4 border-b text-left">Name</th>
+                <th class="py-2 px-4 border-b text-left">Email</th>
+                <th class="py-2 px-4 border-b text-left">Position</th>
+                <th class="py-2 px-4 border-b text-left">Gender</th>
+                <th class="py-2 px-4 border-b text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="employee in employees" :key="employee.id" class="hover:bg-gray-50 transition duration-200">
+                <td class="py-2 px-4 border-b">{{ employee.user.name }}</td>
+                <td class="py-2 px-4 border-b">{{ employee.user.email }}</td>
+                <td class="py-2 px-4 border-b">{{ employee.position }}</td>
+                <td class="py-2 px-4 border-b">{{ employee.user.gender }}</td>
+                <td class="py-2 px-4 border-b">
+                  <button @click="editEmployee(employee)" class="text-blue-600 hover:underline">Edit</button>
+                  <button @click="deleteEmployee(employee.id)" class="text-red-600 hover:underline ml-2">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </main>
@@ -134,94 +143,156 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { UserPlusIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline'
 import { useStorage } from '@vueuse/core'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 
-definePageMeta({
-  middleware: ['admin']
+// State
+const isMobileMenuOpen = ref(false)
+const showForm = ref(false)
+const selectedEmployee = ref(null)
+const token = useStorage('token', '')
+
+const formData = ref({
+  name: '',
+  email: '',
+  password: '',
+  gender: 'male',
+  position: '',
+  office_id: 1 // تأكد من تعيين office_id المناسب
 })
 
-const token = useStorage('token', null)
-const employees = ref([])
-const loading = ref(true)
-const error = ref(null)
-const showDialog = ref(false)
-const currentEmployee = ref(null)
-
-onMounted(() => {
-  fetchEmployees()
+// Fetch employees data
+const { data: employeesData, pending, error, refresh } = await useFetch('/api/admin/attendance/employees', {
+  headers: {
+    'token': token.value
+  },
+  transform: (response) => response.employees
 })
 
-async function fetchEmployees() {
-  try {
-    loading.value = true
-    const response = await $fetch('/api/admin/attendance/employees', {
-      headers: {
-        token: token.value
+// Computed property for employees
+const employees = computed(() => employeesData.value || [])
+
+// Navigation Links
+const navLinks = [
+  { 
+    title: 'Add Employee', 
+    icon: UserPlusIcon, 
+    action: () => {
+      selectedEmployee.value = null
+      formData.value = {
+        name: '',
+        email: '',
+        password: '',
+        gender: 'male',
+        position: '',
+        office_id: 1
       }
-    })
-    if (response && response.employees) {
-      employees.value = response.employees
+      showForm.value = true
     }
-  } catch (err) {
-    error.value = 'حدث خطأ أثناء جلب بيانات الموظفين'
-    console.error('Error fetching employees:', err)
-  } finally {
-    loading.value = false
+  },
+  { 
+    title: 'Logout', 
+    icon: ArrowRightOnRectangleIcon, 
+    action: async () => {
+      token.value = ''
+      await navigateTo('/')
+    }
+  }
+]
+
+// Methods
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+const editEmployee = (employee) => {
+  selectedEmployee.value = employee
+  formData.value = {
+    name: employee.user.name,
+    email: employee.user.email,
+    gender: employee.user.gender,
+    position: employee.position,
+    office_id: employee.office_id,
+    password: null // لا نرسل كلمة المرور عند التعديل إلا إذا أراد المستخدم تغييرها
+  }
+  showForm.value = true
+}
+
+const closeForm = () => {
+  showForm.value = false
+  selectedEmployee.value = null
+  formData.value = {
+    name: '',
+    email: '',
+    password: '',
+    gender: 'male',
+    position: '',
+    office_id: 1
   }
 }
 
-function openAttendanceDialog(employee) {
-  currentEmployee.value = employee
-  showDialog.value = true
+const handleSubmit = async () => {
+  try {
+    if (selectedEmployee.value) {
+      // Update employee
+      await $fetch(`/api/emploeey/${selectedEmployee.value.user.id}`, {
+        method: 'PUT',
+        body: formData.value,
+        headers: {
+          'token': token.value
+        }
+      })
+    } else {
+      // Add new employee
+      await $fetch('/api/emploeey/add', {
+        method: 'POST',
+        body: formData.value,
+        headers: {
+          'token': token.value
+        }
+      })
+    }
+    
+    await refresh() // Refresh the employees list
+    closeForm()
+  } catch (error) {
+    console.error('Error:', error)
+    alert(error.data?.message || 'An error occurred')
+  }
 }
 
-function closeDialog() {
-  showDialog.value = false
-  currentEmployee.value = null
+const deleteEmployee = async (id) => {
+  if (!confirm('Are you sure you want to delete this employee?')) return
+  
+  try {
+    await $fetch(`/api/emploeey/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'token': token.value
+      }
+    })
+    await refresh() // Refresh the employees list
+  } catch (error) {
+    console.error('Error:', error)
+    alert(error.data?.message || 'An error occurred')
+  }
 }
 
-function openAddEmployeeModal() {
-  // يمكنك تنفيذ منطق فتح نافذة إضافة موظف جديد هنا
-  console.log('Open add employee modal')
-}
-
-function logout() {
-  // يمكنك تنفيذ منطق تسجيل الخروج هنا
-  token.value = null
-  navigateTo('/')
-}
-
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString('en-GB', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  })
-}
-
-function formatDay(dateString) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    weekday: 'long'
-  })
-}
-
-function formatTime(dateString) {
-  return new Date(dateString).toLocaleTimeString('ar-SA', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-function calculateHours(checkIn, checkOut) {
-  if (!checkIn || !checkOut) return 'Not specified'
-  const start = new Date(checkIn)
-  const end = new Date(checkOut)
-  const diff = end - start
-  const hours = Math.floor(diff / 3600000)
-  const minutes = Math.floor((diff % 3600000) / 60000)
-  return `${hours} hour(s) and ${minutes} minute(s)`
-}
+// Add navigation guard
+definePageMeta({
+  middleware: ['auth']
+})
 </script>
+
+<style scoped>
+/* Styles for responsiveness */
+@media (max-width: 768px) {
+  aside {
+    display: none; /* Hide sidebar on small screens */
+  }
+  .flex {
+    flex-direction: column;
+  }
+}
+</style>
