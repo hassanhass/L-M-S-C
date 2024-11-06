@@ -1,4 +1,3 @@
-// composables/useAttendance.ts
 import { ref, computed } from 'vue'
 import { useStorage } from '@vueuse/core'
 import { useRouter } from 'vue-router'
@@ -18,10 +17,8 @@ export const useAttendance = () => {
   const notificationType = ref('success')
   const notificationMessage = ref('')
 
-  // ضبط نص الزر بناءً على حالة isCheckedIn
   const buttonText = computed(() => isCheckedIn.value ? 'Check Out' : 'Check In')
   
-  // كلاس الزر يحدد اللون بناءً على حالة isCheckedIn
   const buttonClass = computed(() => isCheckedIn.value ? 'btn-green' : 'btn-red')
 
   function updateDateTime() {
@@ -55,18 +52,18 @@ export const useAttendance = () => {
 
   async function handleAttendance() {
     try {
-        // إرسال طلب الحضور/الخروج إلى الخادم
         const response = await $fetch<{ message: string; toggleState: string }>('/api/attendance/check-in', {
             method: 'POST',
             headers: { 
+
                 'token': token.value,
                 'Content-Type': 'application/json'
+                
             }
         });
   
-        // التحقق من toggleState مباشرة بدون استخدام status
         if (response.toggleState === 'checkedIn' || response.toggleState === 'checkedOut') {
-            isCheckedIn.value = response.toggleState === 'checkedIn'; // تحديث isCheckedIn بناءً على toggleState
+            isCheckedIn.value = response.toggleState === 'checkedIn';
             showToast(response.message, 'success');
             updateStatusMessage();
         } else {
@@ -106,7 +103,7 @@ export const useAttendance = () => {
     notificationType,
     notificationMessage,
     buttonText,
-    buttonClass, // إرجاع كلاس الزر
+    buttonClass,   
     toggleMenu,
     handleAttendance,
     viewAttendanceRecords,
