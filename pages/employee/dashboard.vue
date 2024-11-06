@@ -128,10 +128,4 @@ const calculateDuration = (checkIn, checkOut) => {
   const minutes = Math.floor((diff % 3600000) / 60000)
   return `${hours}h ${minutes}m`
 }
-
-
 </script>
-
-<style scoped>
-/* Add any additional styles here if needed */
-</style>

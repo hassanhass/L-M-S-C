@@ -132,7 +132,7 @@
       v-if="showNotification"
       class="fixed bottom-8 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white text-lg font-medium z-50"
       :class="[
-        notificationType === 'success' ? 'bg-green-500' : 'bg-red-500',
+        notificationType === 'success' ? 'bg-green-500' : 'bg-green-500',
       ]"
     >
       {{ notificationMessage }}
