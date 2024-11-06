@@ -1,30 +1,31 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 flex flex-col">
-    <!-- Header -->
-    <header class="bg-white/80 backdrop-blur-sm shadow-md sticky top-0 z-10">
-      <div class="max-w-7xl mx-auto px-4 py-4">
-        <div class="flex justify-between items-center">
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            TimeMatrix
-          </h1>
-          
+   <!-- Header Section -->
+<!-- Header Section -->
+<header class="bg-white/80 backdrop-blur-sm shadow-md sticky top-0 z-10">
+  <div class="max-w-7xl mx-auto px-4 py-4">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-4">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          TimeMatrix
+        </h1>
+      </div>
+      
+      <!-- User Profile Section -->
+      <div class="flex items-center space-x-3 bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-2 rounded-full shadow-sm">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white text-lg font-bold shadow-md">
+          {{ employeeName.charAt(0).toUpperCase() }}
+        </div>
+        <div class="flex flex-col">
+          <span class="text-sm font-semibold text-gray-700">{{ employeeName }}</span>
         </div>
       </div>
-    </header>
+    </div>
+  </div>
+</header>
 
     <!-- Main Content -->
     <main class="flex-grow p-4 space-y-6 overflow-y-auto">
-      <!-- Employee Info -->
-      <div class="bg-white rounded-2xl shadow-lg p-6">
-        <div class="flex items-center space-x-4">
-         
-          <div>
-            <h2 class="text-xl font-semibold text-gray-800">{{ employeeName }}</h2>
-            <p class="text-gray-600">Employee</p>
-          </div>
-        </div>
-      </div>
-
       <!-- Total Hours -->
       <div class="bg-white rounded-2xl shadow-lg p-6">
         <h2 class="text-xl font-semibold text-gray-800 mb-2">Total Hours This Month</h2>
