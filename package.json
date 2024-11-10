@@ -38,6 +38,7 @@
     "vee-validate": "^4.14.3",
     "vue": "latest",
     "vue-router": "latest",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
