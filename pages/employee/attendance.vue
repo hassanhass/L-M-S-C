@@ -146,7 +146,7 @@
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
-import { definePageMeta } from '#imports'
+
 import { useAttendance } from '@/composables/useAttendance'
 import { useStorage } from '@vueuse/core'
 
