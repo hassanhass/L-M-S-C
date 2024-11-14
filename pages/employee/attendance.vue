@@ -108,7 +108,7 @@
         <!-- Attendance Button -->
         <div class="flex justify-center mb-8">
           <button
-  @click="hussam"
+  @click="attand"
   :class="[
     'attendance-button w-40 h-40 sm:w-48 sm:h-48 rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold text-white shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95',
     lastAttendance?.check_in_time && !lastAttendance?.check_out_time
