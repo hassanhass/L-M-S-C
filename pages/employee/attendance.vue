@@ -174,7 +174,7 @@ const {data:lastAttendance,execute}= await useFetch('/api/attendance/last',{
     'token':token.value
   }
 })
-const hussam =()=>{
+const attend =()=>{
 
   handleAttendance()
   execute()
